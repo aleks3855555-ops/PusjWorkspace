@@ -1,0 +1,33 @@
+services:
+  core:
+    build:
+      context: ./services/core
+    command: bash -lc ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    environment:
+      # Вариант А (позже улучшим): Core сам синкает MasterDocs по токену
+      # MASTERDOCS_TOKEN: ${MASTERDOCS_TOKEN}
+      # MASTERDOCS_REPO_URL: ${MASTERDOCS_REPO_URL}
+
+      # Вариант B (будем доводить): MasterDocs как локальный путь (submodule)
+      MASTERDOCS_LOCAL_PATH: ${MASTERDOCS_LOCAL_PATH}
+      MASTERDOCS_PULL_ON_START: "false"
+    volumes:
+      - ./content/masterdocs:/workspace/content/masterdocs:ro
+      - ./services/core:/workspace/services/core
+    working_dir: /workspace/services/core
+
+  next:
+    build:
+      context: ./services/next
+    command: bash -lc "npm install && npm run dev -- --port 3000 --hostname 0.0.0.0"
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_CORE_BASE_URL: http://core:8000
+    volumes:
+      - ./services/next:/workspace/services/next
+    working_dir: /workspace/services/next
+    depends_on:
+      - core
