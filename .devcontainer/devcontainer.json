@@ -1,0 +1,39 @@
+{
+	"name": "PusjWorkspace Dev",
+	"dockerComposeFile": "../docker-compose.dev.yml",
+	"service": "next",
+	"workspaceFolder": "/workspace",
+	"shutdownAction": "stopCompose",
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"ms-vscode.vscode-typescript-next"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/usr/local/bin/python",
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": true,
+				"editor.formatOnSave": true
+			}
+		}
+	},
+	
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	
+	"forwardPorts": [3000, 8000],
+	"portsAttributes": {
+		"3000": {
+			"label": "Next.js App",
+			"onAutoForward": "notify"
+		},
+		"8000": {
+			"label": "Core API",
+			"onAutoForward": "notify"
+		}
+	}
+}
+

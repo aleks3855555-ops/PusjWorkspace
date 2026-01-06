@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  core:
+    build:
+      context: ./services/core
+      dockerfile: Dockerfile
+    container_name: pusj-core-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+      - MASTERDOCS_LOCAL_PATH=${MASTERDOCS_LOCAL_PATH:-/workspace/content/masterdocs}
+      - MASTERDOCS_PULL_ON_START=${MASTERDOCS_PULL_ON_START:-false}
+      - MASTERDOCS_REPO_URL=${MASTERDOCS_REPO_URL:-}
+      - MASTERDOCS_TOKEN=${MASTERDOCS_TOKEN:-}
+    volumes:
+      - ./services/core:/app
+      - ./content/masterdocs:/workspace/content/masterdocs:ro
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - pusj-dev-network
+    restart: unless-stopped
+
+  next:
+    build:
+      context: ./services/next
+      dockerfile: Dockerfile
+    container_name: pusj-next-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_CORE_BASE_URL=http://core:8000
+      - API_URL=http://core:8000
+    volumes:
+      - ./services/next:/app
+      - next-node-modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --port 3000 --hostname 0.0.0.0"
+    depends_on:
+      core:
+        condition: service_healthy
+    networks:
+      - pusj-dev-network
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: ./services/bot
+      dockerfile: Dockerfile
+    container_name: pusj-bot-dev
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - CORE_BASE_URL=http://core:8000
+    volumes:
+      - ./services/bot:/app
+    command: python -m bot.main
+    depends_on:
+      core:
+        condition: service_healthy
+    networks:
+      - pusj-dev-network
+    restart: unless-stopped
+
+volumes:
+  next-node-modules:
+
+networks:
+  pusj-dev-network:
+    driver: bridge
+

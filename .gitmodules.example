@@ -1,0 +1,15 @@
+[submodule "PusjCore"]
+	path = PusjCore
+	url = https://github.com/your-org/PusjCore.git
+	branch = main
+
+[submodule "PusjNext"]
+	path = PusjNext
+	url = https://github.com/your-org/PusjNext.git
+	branch = main
+
+[submodule "MasterDocs"]
+	path = MasterDocs
+	url = https://github.com/your-org/MasterDocs.git
+	branch = main
+
