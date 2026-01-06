@@ -1,0 +1,16 @@
+[submodule "services/core"]
+	path = services/core
+	url = https://github.com/aleks3855555-ops/PusjCore.git
+	branch = main
+[submodule "services/next"]
+	path = services/next
+	url = https://github.com/aleks3855555-ops/PusjNext.git
+	branch = main
+[submodule "content/masterdocs"]
+	path = content/masterdocs
+	url = https://github.com/aleks3855555-ops/PusjMasterDocs.git
+	branch = main
+[submodule "services/bot"]
+	path = services/bot
+	url = https://github.com/aleks3855555-ops/PusjBot.git
+	branch = main
